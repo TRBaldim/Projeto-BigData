@@ -1,4 +1,4 @@
-name := "twitter-flink-conn"
+name := "twitter-bigdata"
 
 version := "1.0"
 
