@@ -15,6 +15,16 @@ Criaremos um crawler onde ele irá ser alimentado com determinados tipos de prod
 
 ###Faremos um stack de desenvolvimento utilizando as seguintes ferramentas:
 
+#Apache Flink
+
+<p align="center">
+	<a href="https://flink.apache.org/">
+		<img src="http://10minbasics.com/wp-content/uploads/2015/10/flink.png">
+	</a>
+</p>
+
+Apache Flink é uma ferramenta muito usada para Streamming em Real Time. Seu principio é Streaming First! Logo, para a interface de streaming será usado este tipo de solução para extrair dados do Twitter.
+
 #Apache Spark
 
 <p align="center">
