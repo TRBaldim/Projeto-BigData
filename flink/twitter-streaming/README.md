@@ -17,3 +17,9 @@
 		<li> Para o Apahe Flink: /opt/flink/flink-1.2.0/bin/stop-local.sh</li>
 	</ul>
 </p>
+
+##Twitter API - Flink
+
+<p>
+	Para garantir a conexão com o twitter, foi seguido o seguinte processo da documentação do Flink (https://ci.apache.org/projects/flink/flink-docs-release-1.2/dev/connectors/twitter.html)
+</p>
