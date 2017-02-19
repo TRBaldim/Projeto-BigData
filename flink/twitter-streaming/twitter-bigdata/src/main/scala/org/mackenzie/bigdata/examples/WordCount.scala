@@ -1,4 +1,4 @@
-package org.mackenzie.bigdata.twitter
+package org.mackenzie.bigdata.examples
 
 /**
   * Created by thiago on 18/02/17.
