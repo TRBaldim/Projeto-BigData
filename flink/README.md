@@ -61,3 +61,7 @@
 Para a instalação do projeto segue abaixo o link da páigna do projet Apache Flink para a instalação e configuração do ambiente
 
 Instalação - https://ci.apache.org/projects/flink/flink-docs-release-1.2/quickstart/setup_quickstart.html
+
+<a href="http://dataartisans.github.io/flink-training/">
+#Curso Apache Flink
+</a>

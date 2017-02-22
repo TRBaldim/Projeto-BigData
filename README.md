@@ -48,7 +48,7 @@ Apache Kafka é uma ferramenta de Streaming distribuido. Permitindo rápido arma
 
 <p align="center">
 	<a href="http://cassandra.apache.org/">
-		<img src="http://www.geroba.com/wp-content/uploads/2013/07/220px-Cassandra_logo.svg1_.png">
+		<img src="http://vignette1.wikia.nocookie.net/digitalhaunt/images/5/55/Screen_Shot_2013-06-07_at_18.20.42.png">
 	</a>
 </p>
 
