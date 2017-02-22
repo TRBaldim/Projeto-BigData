@@ -6,7 +6,7 @@
 
 Este projeto será focado em análise de dados em tempo real do Twitter.
 
-Criaremos um crawler onde ele irá ser alimentado com determinados tipos de produtores de conteúdo como Exame, Estadão, Folha de São Paulo e ele irá procurar outros influenciadores que fazem a distribuição dos dados. Motaremos estatisticas e modelos para identificação desses dados.
+Criaremos um crawler onde ele irá ser alimentado com determinados tipos de produtores de conteúdo como Exame, Estadão, Folha de São Paulo e ele irá procurar outros influenciadores que fazem a distribuição dos dados. Motaremos estatisticas e apresentaremos estruturas de grafos para análise de modelos de focos.
 
 <p align="center">
 		<img src="https://c1.staticflickr.com/3/2685/4311427445_4feee06d50.jpg">
@@ -53,3 +53,17 @@ Apache Kafka é uma ferramenta de Streaming distribuido. Permitindo rápido arma
 </p>
 
 Apache Cassandra permite alta escalabilidade e alta disponibilidade quando é necessário acesso aos seus dados. O cassandra permite tanto acesso a dados pontuais quanto massivos de forma performática.
+
+#Visualização de Dados
+
+<p align="center">
+	<a href="http://jupyter.org/">
+		<img src="http://www.i-programmer.info/images/stories/News/2015/Mar/A/jupyter.jpg">
+	</a>
+</p>
+
+<p>
+	A visualização de dados será desenvolvido vi python notebook, será desenvolvido um modelo em grafo para identificação de clusters. E em seus centros seriam identificados como influenciadores.
+</p>
+
+
