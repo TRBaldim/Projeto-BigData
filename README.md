@@ -29,7 +29,7 @@ Apache Flink é uma ferramenta muito usada para Streamming em Real Time. Seu pri
 
 <p align="center">
 	<a href="http://spark.apache.org/">
-		<img src="http://www.contexti.com/wp-content/uploads/2014/09/spark_2.png">
+		<img src="http://spark.apache.org/images/spark-logo-trademark.png">
 	</a>
 </p>
 
