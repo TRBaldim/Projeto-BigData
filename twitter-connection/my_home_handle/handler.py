@@ -79,13 +79,13 @@ class Handler:
         try:
             print 'Salvando Tweets'
             self.tweets_file.write(io_string)
-            self.tweets_file.flush()
             commit_offset = True
         except Exception as e:
             raise Exception('Erro ao escrever no arquivo com Tweets', e.message)
         if commit_offset:
             try:
                 self.commit_offset(list(sorted(tweets_ids, reverse=True))[0])
+                self.tweets_file.flush()
                 return commit_offset
             except Exception as e:
                 print 'Sem novos tweets, iniciando processo de tweets antigos'
