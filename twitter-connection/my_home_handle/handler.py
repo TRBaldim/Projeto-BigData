@@ -27,6 +27,7 @@ class Handler:
                                      access_token_key=cp.get('keys', 'access_token_key'),
                                      access_token_secret=cp.get('keys', 'access_token_secret'))
         self.statuses_twitter = None
+        self.running = False
 
     def commit_offset(self, offset):
         '''
@@ -38,6 +39,7 @@ class Handler:
         self.offset_file.write(str(offset))
         self.offset_file.truncate()
         self.offset_file.flush()
+        self.actual_offset = offset
 
     def get_tweets(self):
         '''
@@ -45,7 +47,7 @@ class Handler:
         :return: None
         '''
         tweets = None
-        if self.statuses_twitter == None:
+        if self.running:
             time.sleep(60)
         try:
             tweets = self.connector.GetHomeTimeline(count=200,
@@ -59,10 +61,9 @@ class Handler:
                                                     since_id=self.actual_offset,
                                                     exclude_replies=True)
         finally:
-            if tweets:
-                self.statuses_twitter = tweets
-            else:
-                tweets = []
+            self.running = True
+            self.statuses_twitter = tweets
+
 
     def save_tweets(self):
         io_string = ''
