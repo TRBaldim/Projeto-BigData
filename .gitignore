@@ -109,5 +109,8 @@ ENV/
 .ropeproject
 .idea
 *.db
-keys.cfg
+
+#Project config files
+*.cfg
 *.tweets
+*.offset
