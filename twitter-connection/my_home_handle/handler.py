@@ -10,14 +10,20 @@ class Handler:
 
         try:
             self.offset_file = open('home.offset', 'r+')
+            self.actual_offset_start = int(self.offset_file.readline())
+            self.actual_offset_ends = int(self.offset_file.readline())
+            self.last_offset = int(self.offset_file.readline())
         except IOError as e:
             print 'Nao foi possivel criar arquivo de offset'
             print e.message
             print 'Criando Arquivo'
             open('home.offset', 'a').close()
             self.offset_file = open('home.offset', 'r+')
+            self.actual_offset_start = None
+            self.actual_offset_ends = None
+            self.last_offset = None
 
-        self.actual_offset = self.offset_file.readline()
+
 
         # TODO: Esta variavel sera alterada pela conexao com o kafka
         self.tweets_file = open('myfile.tweets', 'a')
@@ -28,6 +34,7 @@ class Handler:
                                      access_token_secret=cp.get('keys', 'access_token_secret'))
         self.statuses_twitter = None
         self.running = False
+        self.old_tweets_flag = False
 
     def commit_offset(self, offset):
         '''
@@ -36,10 +43,18 @@ class Handler:
         :return: None
         '''
         self.offset_file.seek(0)
-        self.offset_file.write(str(offset))
+        self.actual_offset_ends = offset[len(offset) - 1]
+        if not self.old_tweets_flag:
+            self.actual_offset_start = offset[0]
+        else:
+            self.actual_offset_start = self.actual_offset_start
+            self.actual_offset_ends -= 1
+        self.offset_file.write(str(self.actual_offset_start))
+        self.offset_file.write('\n')
+        self.offset_file.write(str(self.actual_offset_ends))
         self.offset_file.truncate()
         self.offset_file.flush()
-        self.actual_offset = offset
+
 
     def get_tweets(self):
         '''
@@ -50,20 +65,27 @@ class Handler:
         if self.running:
             time.sleep(60)
         try:
-            tweets = self.connector.GetHomeTimeline(count=200,
-                                                    since_id=self.actual_offset,
-                                                    exclude_replies=True)
+            if self.old_tweets_flag:
+                tweets = self.connector.GetHomeTimeline(count=200,
+                                                        max_id=self.actual_offset_ends,
+                                                        exclude_replies=True)
+            else:
+                tweets = self.connector.GetHomeTimeline(count=200,
+                                                        since_id=self.actual_offset_start,
+                                                        exclude_replies=True)
         except twitter.TwitterError as e:
             print 'Excesso de chamadas para recuperar os tweets'
             print e.message
             time.sleep(901)
             tweets = self.connector.GetHomeTimeline(count=200,
-                                                    since_id=self.actual_offset,
+                                                    since_id=self.actual_offset_start,
                                                     exclude_replies=True)
         finally:
             self.running = True
             self.statuses_twitter = tweets
 
+    def get_old_tweets(self):
+        pass
 
     def save_tweets(self):
         io_string = ''
@@ -77,17 +99,19 @@ class Handler:
             tweets_ids.add(tweet['id'])
             count_tweets += 1
         try:
-            print 'Salvando Tweets'
+            print 'Salvando Tweets total: ' + str(count_tweets)
             self.tweets_file.write(io_string)
             commit_offset = True
         except Exception as e:
             raise Exception('Erro ao escrever no arquivo com Tweets', e.message)
         if commit_offset:
             try:
-                self.commit_offset(list(sorted(tweets_ids, reverse=True))[0])
+                self.commit_offset(list(sorted(tweets_ids, reverse=True)))
                 self.tweets_file.flush()
+                self.old_tweets_flag = False
                 return commit_offset
             except Exception as e:
+                self.old_tweets_flag = True if not self.old_tweets_flag else False
                 print 'Sem novos tweets, iniciando processo de tweets antigos'
                 #TODO: Criar metodo para gerenciar tweets antigos
                 print e.message
