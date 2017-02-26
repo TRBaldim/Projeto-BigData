@@ -25,7 +25,6 @@ class Handler:
             self.actual_offset_ends = None
             self.last_offset = None
 
-        # TODO: Esta variavel sera alterada pela conexao com o kafka
         kafka = KafkaClient('172.17.0.3:9092')
         self.producer = SimpleProducer(kafka)
 
