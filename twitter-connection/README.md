@@ -13,6 +13,10 @@
 </p>
 
 <p>
+	Para a conexão com o Kafka utilizamos a seguinte biblioteca <a href="https://github.com/dpkp/kafka-python">kafka-python</a>
+</p>
+
+<p>
 	A biblioteca pode ser instalada via Anaconda com o conda install <i>conda install -c auto python-twitter</i>
 </p>
 

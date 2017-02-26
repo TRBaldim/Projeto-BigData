@@ -2,7 +2,7 @@ import twitter
 import time
 import logging
 from configparser import ConfigParser
-
+from kafka import KafkaClient, SimpleProducer
 
 
 class Handler:
@@ -26,7 +26,8 @@ class Handler:
             self.last_offset = None
 
         # TODO: Esta variavel sera alterada pela conexao com o kafka
-        self.tweets_file = open('myfile.tweets', 'a')
+        kafka = KafkaClient('172.17.0.3:9092')
+        self.producer = SimpleProducer(kafka)
 
         self.connector = twitter.Api(consumer_key=cp.get('keys', 'consumer_key'),
                                      consumer_secret=cp.get('keys', 'consumer_secret'),
@@ -101,16 +102,15 @@ class Handler:
             io_string += '\n'
             tweets_ids.add(tweet['id'])
             count_tweets += 1
+            self.producer.send_messages(b'twitter', str(t).encode('utf-8'))
         try:
             logging.info('Salvando Tweets total: ' + str(count_tweets))
-            self.tweets_file.write(io_string)
             commit_offset = True
         except Exception as e:
             raise Exception('Erro ao escrever no arquivo com Tweets', e.message)
         if commit_offset:
             try:
                 self.commit_offset(list(sorted(tweets_ids, reverse=True)))
-                self.tweets_file.flush()
                 self.old_tweets_flag = False
                 return commit_offset
             except Exception as e:
