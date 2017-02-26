@@ -23,8 +23,6 @@ class Handler:
             self.actual_offset_ends = None
             self.last_offset = None
 
-
-
         # TODO: Esta variavel sera alterada pela conexao com o kafka
         self.tweets_file = open('myfile.tweets', 'a')
 
@@ -44,6 +42,7 @@ class Handler:
         '''
         self.offset_file.seek(0)
         self.actual_offset_ends = offset[len(offset) - 1]
+        self.last_offset = offset[len(offset) - 1] if self.last_offset != 0 else 0
         if not self.old_tweets_flag:
             self.actual_offset_start = offset[0]
         else:
@@ -52,9 +51,10 @@ class Handler:
         self.offset_file.write(str(self.actual_offset_start))
         self.offset_file.write('\n')
         self.offset_file.write(str(self.actual_offset_ends))
+        self.offset_file.write('\n')
+        self.offset_file.write(str(self.last_offset))
         self.offset_file.truncate()
         self.offset_file.flush()
-
 
     def get_tweets(self):
         '''
@@ -65,14 +65,17 @@ class Handler:
         if self.running:
             time.sleep(60)
         try:
-            if self.old_tweets_flag:
+            if self.old_tweets_flag and \
+               self.actual_offset_ends <= self.last_offset:
                 tweets = self.connector.GetHomeTimeline(count=200,
                                                         max_id=self.actual_offset_ends,
                                                         exclude_replies=True)
-            else:
+            elif not self.old_tweets_flag:
                 tweets = self.connector.GetHomeTimeline(count=200,
                                                         since_id=self.actual_offset_start,
                                                         exclude_replies=True)
+            else:
+                tweets = []
         except twitter.TwitterError as e:
             print 'Excesso de chamadas para recuperar os tweets'
             print e.message
@@ -111,9 +114,13 @@ class Handler:
                 self.old_tweets_flag = False
                 return commit_offset
             except Exception as e:
-                self.old_tweets_flag = True if not self.old_tweets_flag else False
+                if not self.old_tweets_flag:
+                    self.old_tweets_flag = True
+                else:
+                    self.old_tweets_flag = False
+                    self.last_offset = 0
+
                 print 'Sem novos tweets, iniciando processo de tweets antigos'
-                #TODO: Criar metodo para gerenciar tweets antigos
                 print e.message
                 commit_offset = False
                 return commit_offset
