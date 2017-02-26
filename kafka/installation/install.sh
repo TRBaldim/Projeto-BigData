@@ -20,7 +20,7 @@ sudo apt-get update
 sudo apt-get -y install docker-engine
 sudo docker run hello-world
 
-#composer
+#composer (Optional)
 
 sudo curl -L "https://github.com/docker/compose/releases/download/1.11.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
@@ -43,5 +43,6 @@ sudo docker run --rm --interactive ches/kafka kafka-console-producer.sh \
 	--topic twitter --broker-list $KAFKA_IP:9092
 
 #Exemplo de Consumer
-sudo docker run --rm ches/kafka kafka-console-consumer.sh --topic twitter --from-beginning --zookeeper $ZK_IP:2181
+sudo docker run --rm ches/kafka kafka-console-consumer.sh --topic twitter \
+	--from-beginning --zookeeper $ZK_IP:2181
  
