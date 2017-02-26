@@ -1,6 +1,8 @@
 import twitter
 import time
+import logging
 from configparser import ConfigParser
+
 
 
 class Handler:
@@ -14,9 +16,9 @@ class Handler:
             self.actual_offset_ends = int(self.offset_file.readline())
             self.last_offset = int(self.offset_file.readline())
         except IOError as e:
-            print 'Nao foi possivel criar arquivo de offset'
-            print e.message
-            print 'Criando Arquivo'
+            logging.info('Nao foi possivel criar arquivo de offset')
+            logging.debug(e.message)
+            logging.info('Criando Arquivo')
             open('home.offset', 'a').close()
             self.offset_file = open('home.offset', 'r+')
             self.actual_offset_start = None
@@ -77,12 +79,10 @@ class Handler:
             else:
                 tweets = []
         except twitter.TwitterError as e:
-            print 'Excesso de chamadas para recuperar os tweets'
-            print e.message
-            time.sleep(901)
-            tweets = self.connector.GetHomeTimeline(count=200,
-                                                    since_id=self.actual_offset_start,
-                                                    exclude_replies=True)
+            logging.error('Excesso de chamadas para recuperar os tweets')
+            logging.debug(e.message)
+            time.sleep(900)
+
         finally:
             self.running = True
             self.statuses_twitter = tweets
@@ -102,7 +102,7 @@ class Handler:
             tweets_ids.add(tweet['id'])
             count_tweets += 1
         try:
-            print 'Salvando Tweets total: ' + str(count_tweets)
+            logging.info('Salvando Tweets total: ' + str(count_tweets))
             self.tweets_file.write(io_string)
             commit_offset = True
         except Exception as e:
@@ -119,9 +119,8 @@ class Handler:
                 else:
                     self.old_tweets_flag = False
                     self.last_offset = 0
-
-                print 'Sem novos tweets, iniciando processo de tweets antigos'
-                print e.message
+                logging.info('Sem novos tweets')
+                logging.debug('e.message')
                 commit_offset = False
                 return commit_offset
 
