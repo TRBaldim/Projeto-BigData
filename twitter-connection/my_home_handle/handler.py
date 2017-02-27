@@ -1,6 +1,7 @@
 import twitter
 import time
 import logging
+import sqlite3
 from configparser import ConfigParser
 from kafka import KafkaClient, SimpleProducer
 
@@ -10,21 +11,27 @@ class Handler:
         cp = ConfigParser()
         cp.read('keys.cfg')
 
-        try:
-            self.offset_file = open('home.offset', 'r+')
-            self.actual_offset_start = int(self.offset_file.readline())
-            self.actual_offset_ends = int(self.offset_file.readline())
-            self.last_offset = int(self.offset_file.readline())
-        except IOError as e:
-            logging.info('Nao foi possivel criar arquivo de offset')
-            logging.debug(e.message)
-            logging.info('Criando Arquivo')
-            open('home.offset', 'a').close()
-            self.offset_file = open('home.offset', 'r+')
+        self.conn = sqlite3.connect('offset.db')
+        self.cursor = self.conn.cursor()
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS offsets
+                                      (position TEXT, offset INTEGER)''')
+        self.conn.commit()
+
+        results = self.get_offsets()
+
+        if results:
+            self.actual_offset_start = results[0][1]
+            self.actual_offset_ends = results[1][1]
+            self.last_offset = results[2][1]
+        else:
+            self.cursor.execute('''INSERT INTO offsets VALUES ('start', 0)''')
+            self.cursor.execute('''INSERT INTO offsets VALUES ('end', 0)''')
+            self.cursor.execute('''INSERT INTO offsets VALUES ('last', 0)''')
+            self.conn.commit()
             self.actual_offset_start = None
             self.actual_offset_ends = None
             self.last_offset = None
-
+        # Kafka Connection
         kafka = KafkaClient('172.17.0.3:9092')
         self.producer = SimpleProducer(kafka)
 
@@ -36,13 +43,27 @@ class Handler:
         self.running = False
         self.old_tweets_flag = False
 
+    def get_offsets(self):
+        self.cursor.execute('''SELECT * FROM offsets''')
+        results = self.cursor.fetchall()
+        if results:
+            return results
+        else:
+            return None
+
+    def update_offset(self, key, value):
+        query = 'UPDATE offsets SET position = \"' + key + \
+                '\", offset = ' + str(value) + \
+                ' WHERE position = \"' + key + '\"'
+        self.cursor.execute(query)
+        self.conn.commit()
+
     def commit_offset(self, offset):
         '''
         Gerencia o offset de tweets caso haja alguma queda no processamento do dado.
         :param offset: id do ultimo tweet lido pela aplicacao
         :return: None
         '''
-        self.offset_file.seek(0)
         self.actual_offset_ends = offset[len(offset) - 1]
         self.last_offset = offset[len(offset) - 1] if self.last_offset != 0 else 0
         if not self.old_tweets_flag:
@@ -50,13 +71,9 @@ class Handler:
         else:
             self.actual_offset_start = self.actual_offset_start
             self.actual_offset_ends -= 1
-        self.offset_file.write(str(self.actual_offset_start))
-        self.offset_file.write('\n')
-        self.offset_file.write(str(self.actual_offset_ends))
-        self.offset_file.write('\n')
-        self.offset_file.write(str(self.last_offset))
-        self.offset_file.truncate()
-        self.offset_file.flush()
+        self.update_offset('start', self.actual_offset_start)
+        self.update_offset('end', self.actual_offset_ends)
+        self.update_offset('last', self.last_offset)
 
     def get_tweets(self):
         '''
@@ -101,11 +118,13 @@ class Handler:
             io_string += '\n'
             tweets_ids.add(tweet['id'])
             count_tweets += 1
-            self.producer.send_messages(b'twitter', str(t).encode('utf-8'))
         try:
             logging.info('Salvando Tweets total: ' + str(count_tweets))
+            if count_tweets:
+                self.producer.send_messages(b'twitter', str(io_string).encode('utf-8'))
             commit_offset = True
         except Exception as e:
+            print e.message
             raise Exception('Erro ao escrever no arquivo com Tweets', e.message)
         if commit_offset:
             try:
@@ -119,7 +138,7 @@ class Handler:
                     self.old_tweets_flag = False
                     self.last_offset = 0
                 logging.info('Sem novos tweets')
-                logging.debug('e.message')
+                logging.debug(e.message)
                 commit_offset = False
                 return commit_offset
 

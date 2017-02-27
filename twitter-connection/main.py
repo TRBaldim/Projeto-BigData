@@ -13,5 +13,6 @@ while True:
     try:
         handler.get_tweets()
         handler.save_tweets()
-    except:
-        handler.offset_file.close()
+    except :
+
+        handler.conn.commit()
