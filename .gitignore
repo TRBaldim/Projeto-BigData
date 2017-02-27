@@ -114,3 +114,4 @@ ENV/
 *.cfg
 *.tweets
 *.offset
+*.db
