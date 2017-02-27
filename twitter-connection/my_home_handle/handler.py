@@ -124,8 +124,8 @@ class Handler:
                 self.producer.send_messages(b'twitter', str(io_string).encode('utf-8'))
             commit_offset = True
         except Exception as e:
-            print e.message
-            raise Exception('Erro ao escrever no arquivo com Tweets', e.message)
+            logging.error('Erro ao escrever no arquivo com Tweets', e.message)
+            commit_offset = False
         if commit_offset:
             try:
                 self.commit_offset(list(sorted(tweets_ids, reverse=True)))
@@ -141,6 +141,8 @@ class Handler:
                 logging.debug(e.message)
                 commit_offset = False
                 return commit_offset
+        else:
+            return commit_offset
 
 
 
