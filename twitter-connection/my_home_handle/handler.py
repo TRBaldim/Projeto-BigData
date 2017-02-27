@@ -65,7 +65,7 @@ class Handler:
         '''
         tweets = None
         if self.running:
-            time.sleep(60)
+            time.sleep(61)
         try:
             if self.old_tweets_flag and \
                self.actual_offset_ends <= self.last_offset:
