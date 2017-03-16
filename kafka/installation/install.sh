@@ -35,6 +35,9 @@ sudo docker run -d --name kafka --link zookeeper:zookeeper ches/kafka
 ZK_IP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' zookeeper)
 KAFKA_IP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' kafka)
 
+echo $ZK_IP
+echo $KAFKA_IP
+
 sudo docker run --rm ches/kafka kafka-topics.sh --create --topic twitter \
 	--replication-factor 1 --partitions 1 --zookeeper $ZK_IP:2181
 
