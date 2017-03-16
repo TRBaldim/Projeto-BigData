@@ -1,4 +1,4 @@
-from random import shuffle
+import random
 from algorithms import knn
 import matplotlib.pyplot as plt
 
@@ -11,14 +11,15 @@ for i in data_file:
     data_list = ([float(k) for k in split_row[:4]], split_row[4])
     data_matrix.append(data_list)
 
-shuffle(data_matrix)
+random.seed(42)
+random.shuffle(data_matrix)
 
 data_test = data_matrix[105:]
 data_matrix = data_matrix[:105]
 
 result_data = []
 for t in data_test:
-    res = (knn(t[0], data_matrix), t[1])
+    res = (knn(t[0], data_matrix, 'quadratic'), t[1])
     result_data.append(res)
     print res
 
@@ -33,7 +34,7 @@ for i in result_data:
 print graph_res
 
 axes = plt.gca()
-axes.set_ylim([0.0, 1.0])
+axes.set_ylim([0.5, 1.1])
 plt.plot(graph_res)
 plt.ylabel('Precision')
 plt.show()

@@ -1,12 +1,12 @@
 from test_math import euclidian_knn
 
 
-def knn(input_array, input_matrix):
+def knn(input_array, input_matrix, type):
     def_k = (len(input_matrix) / 3)
     # Calculate and sort distance
     distance_array = []
     for i in input_matrix:
-        distance_array.append(euclidian_knn(input_array, i))
+        distance_array.append(euclidian_knn(input_array, i, type))
 
     # sorted Function Uses Timsort for ordering the data
     # https://en.wikipedia.org/wiki/Timsort
