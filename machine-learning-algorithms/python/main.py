@@ -3,7 +3,7 @@ from algorithms import knn
 import time
 
 # Dataset was loaded from http://archive.ics.uci.edu/ml/datasets/Iris
-data_file = open('../datasets/fat_iris.data')
+data_file = open('../datasets/iris.data')
 
 data_matrix = []
 for i in data_file:
@@ -17,6 +17,6 @@ random.shuffle(data_matrix)
 result_data = []
 
 start_time = time.clock()
-res = knn([1.0, 2.0, 1.1, 1.8], data_matrix, 'quadratic')
+res = knn([1.0, 2.0, 1.1, 1.8], data_matrix, 'numpy')
 print time.clock() - start_time
 print res
