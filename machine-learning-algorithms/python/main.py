@@ -1,9 +1,9 @@
 import random
 from algorithms import knn
-import matplotlib.pyplot as plt
+import time
 
 # Dataset was loaded from http://archive.ics.uci.edu/ml/datasets/Iris
-data_file = open('../datasets/iris.data')
+data_file = open('../datasets/fat_iris.data')
 
 data_matrix = []
 for i in data_file:
@@ -14,27 +14,9 @@ for i in data_file:
 random.seed(42)
 random.shuffle(data_matrix)
 
-data_test = data_matrix[105:]
-data_matrix = data_matrix[:105]
-
 result_data = []
-for t in data_test:
-    res = (knn(t[0], data_matrix, 'quadratic'), t[1])
-    result_data.append(res)
-    print res
 
-count = 0.0
-right = 0.0
-graph_res = []
-for i in result_data:
-    count += 1.0
-    right += 1.0 if i[0] == i[1] else 0.0
-    print right / count
-    graph_res.append(right / count)
-print graph_res
-
-axes = plt.gca()
-axes.set_ylim([0.5, 1.1])
-plt.plot(graph_res)
-plt.ylabel('Precision')
-plt.show()
+start_time = time.clock()
+res = knn([1.0, 2.0, 1.1, 1.8], data_matrix, 'quadratic')
+print time.clock() - start_time
+print res
