@@ -2,7 +2,7 @@ from test_math import euclidian_knn
 
 
 def knn(input_array, input_matrix, type):
-    def_k = (len(input_matrix) / 3)
+    def_k = (len(input_matrix) / 5)
     # Calculate and sort distance
     distance_array = []
     for i in input_matrix:
@@ -22,3 +22,17 @@ def knn(input_array, input_matrix, type):
 
     # Get the max value at the knn analysis
     return max(dict_result, key=dict_result.get)
+
+
+def spark_knn(input_array, rdd, type):
+    count_rdd = rdd.count()
+    def_k = (count_rdd / 5)
+
+    result = rdd.map(lambda m: euclidian_knn(input_array, m, type))\
+                .sortBy(lambda data: data[0])\
+                .zipWithIndex()\
+                .filter(lambda x: x[1] < def_k)\
+                .map(lambda x: (x[0][1], x[0][0] * (1.0 / float(x[1] + 1))))\
+                .reduceByKey(lambda a, b: a + b).max(key=lambda x: x[1])
+
+    return result
