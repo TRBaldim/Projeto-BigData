@@ -116,3 +116,4 @@ ENV/
 *.offset
 *.db
 *.data
+*.tsv
