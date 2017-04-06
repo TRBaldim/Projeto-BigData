@@ -50,6 +50,10 @@ train_data = vectorizer.fit_transform(text_data[:20000])
 
 train_data_features = train_data.toarray()
 
+print len(train_data_features)
+print len(train_data_features[0])
+
+'''
 vocab = vectorizer.get_feature_names()
 
 forest = RandomForestClassifier(n_estimators=100)
@@ -57,7 +61,7 @@ df = train
 train = df.sample(frac=0.8, random_state=200)
 test = df.drop(train.index)
 forest = forest.fit(train_data_features, train['sentiment'])
-'''
+
 num_of_reviews = len(test['review'])
 clean_test_review = []
 
@@ -66,14 +70,15 @@ for i in xrange(0, num_of_reviews):
         print "Review %d of %d\n" % (i+1, num_of_reviews)
     clean_review = review_to_words(test["review"][i])
     clean_test_review.append(clean_review)
-'''
+
 
 test_data_features = vectorizer.transform(test['review'])
 test_data_features = test_data_features.toarray()
 
 result = forest.predict(test_data_features)
 
-output = pd.DataFrame(data={'id': test['id'], 'seintiment': result})
+output = pd.DataFrame(data={'id': test['id'], 'sentiment': result})
 
 for i in output.toarray():
     print i
+'''
