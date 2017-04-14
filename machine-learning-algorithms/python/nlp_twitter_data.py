@@ -52,6 +52,6 @@ for i in range(485):
     data_matrix.append(data_list)
 
 for i in range(485, 500):
-    res = knn(train_data_features[i], data_matrix, 'euclidian')
+    res = knn(train_data_features[i], data_matrix, 'cos')
     print train_data_features[i], my_data[i]
     print res

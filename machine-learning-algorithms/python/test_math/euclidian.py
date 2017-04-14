@@ -29,6 +29,21 @@ def calc_quadratic_distance(vec_a, vec_b):
         sum_data += (a - b) ** 2
     return sum_data
 
+
+def calc_cos_sim(vec_a, vec_b):
+    sum_data_ab = 0
+    sum_data_a = 0
+    sum_data_b = 0
+
+    for a, b in itertools.izip(vec_a, vec_b):
+        sum_data_ab += a * b
+        sum_data_a += a ** 2
+        sum_data_b += b ** 2
+
+    r = math.acos(sum_data_ab / (math.sqrt(sum_data_a) * math.sqrt(sum_data_b))) / math.pi
+    return r
+
+
 def euclidian_knn(vec_a, tup_b, type):
     '''
     Calculate knn with euclidian Distance using KNN core algorithm
@@ -41,5 +56,7 @@ def euclidian_knn(vec_a, tup_b, type):
         return calc_euclidian_distance(vec_a, vec_b), label
     elif type == 'quadratic':
         return calc_quadratic_distance(vec_a, vec_b), label
+    elif type == 'cos':
+        return calc_cos_sim(vec_a, vec_b), label
     else:
         return 0
