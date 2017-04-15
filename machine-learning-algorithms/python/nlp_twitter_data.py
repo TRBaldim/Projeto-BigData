@@ -2,8 +2,13 @@ from algorithms import knn
 import re
 import json
 from unidecode import unidecode
+import pandas as pd
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
+import matplotlib.pyplot as plt
+import matplotlib as mlt
+
+mlt.use('TkAgg')
 
 def remove_http(s):
     text_list = re.sub("[^a-zA-Z]", " ", s[:s.find('http')]).lower().split()
@@ -47,11 +52,38 @@ train_data = vectorizer.fit_transform(my_text_data)
 train_data_features = train_data.toarray()
 
 data_matrix = []
-for i in range(485):
+for i in range(460):
     data_list = (train_data_features[i], my_data[i]['type'])
     data_matrix.append(data_list)
 
-for i in range(485, 500):
-    res = knn(train_data_features[i], data_matrix, 'cos')
-    print train_data_features[i], my_data[i]
-    print res
+dict_data = {}
+for type in ['euclidian', 'quadratic', 'cos']:
+    print type
+    ks = []
+    acc = []
+    to_pandas = {}
+    for k in range(1, 21):
+        positive = 0
+        count_data = 0
+        for i in range(460, 500):
+            res = knn(train_data_features[i], data_matrix, type, k=k)
+            if my_data[i]['type'] == res:
+                positive += 1
+            count_data += 1
+        print k, float(positive)/float(count_data)
+        ks.append(k)
+        acc.append(float(positive)/float(count_data))
+    to_pandas['k'] = ks
+    to_pandas['accuracy'] = acc
+    dict_data[type] = pd.DataFrame(to_pandas)
+
+plt.plot(dict_data['euclidian']['k'], dict_data['euclidian']['accuracy'], label='Euclidian')
+plt.plot(dict_data['quadratic']['k'], dict_data['quadratic']['accuracy'], label='Quadratic')
+plt.plot(dict_data['cos']['k'], dict_data['cos']['accuracy'], label='Cosine')
+plt.ylabel('Accuracy')
+plt.xlabel('KNN')
+#plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+#           ncol=2, mode="expand", borderaxespad=0.)
+plt.show()
+
+

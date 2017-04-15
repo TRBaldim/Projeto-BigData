@@ -40,8 +40,13 @@ def calc_cos_sim(vec_a, vec_b):
         sum_data_a += a ** 2
         sum_data_b += b ** 2
 
-    r = math.acos(sum_data_ab / (math.sqrt(sum_data_a) * math.sqrt(sum_data_b))) / math.pi
-    return r
+    similarity = sum_data_ab / (math.sqrt(sum_data_a) * math.sqrt(sum_data_b))
+    try:
+        distance = math.acos(similarity) / math.pi
+    except:
+        # Handle the precision of float in the math.sqrt that can create number bigger than 1.0 like 1.000000000001
+        distance = math.acos(round(similarity)) / math.pi
+    return distance
 
 
 def euclidian_knn(vec_a, tup_b, type):

@@ -1,8 +1,8 @@
 from test_math import euclidian_knn
 
 
-def knn(input_array, input_matrix, type):
-    def_k = (len(input_matrix) / 100)
+def knn(input_array, input_matrix, type, k=None):
+    def_k = k if k else 5
     # Calculate and sort distance
     distance_array = []
     for i in input_matrix:
